@@ -619,7 +619,7 @@ app.post('/api/notify/test', async (req, res) => {
 // Start Server
 app.listen(PORT, () => {
   console.log(`====================================================`);
-  console.log(`  ระบบรับสมัครเรียนออนไลน์ครบวงจร (Student Admission V2)`);
+  console.log(`  ระบบรับสมัครเรียนออนไลน์ - วิทยาลัยเทคนิคท่าหลวงซิเมนต์ไทยอนุสรณ์`);
   console.log(`  เซิร์ฟเวอร์เปิดใช้งานที่: http://localhost:${PORT}`);
   console.log(`  - หน้าผู้สมัครเรียน:     http://localhost:${PORT}/index.html`);
   console.log(`  - หน้าเจ้าหน้าที่ (แอดมิน): http://localhost:${PORT}/admin.html`);

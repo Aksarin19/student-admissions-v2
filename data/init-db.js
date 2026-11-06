@@ -22,7 +22,7 @@ const mockIds = [
 
 const initialData = {
   settings: {
-    collegeName: "วิทยาลัยอาชีวศึกษาเทคโนโลยีสารสนเทศ",
+    collegeName: "วิทยาลัยเทคนิคท่าหลวงซิเมนต์ไทยอนุสรณ์",
     collegeSubName: "สำนักงานคณะกรรมการการอาชีวศึกษา (สอศ.)",
     academicYear: "2569",
     term: "1",
