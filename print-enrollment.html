@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>หนังสือมอบตัวนักเรียน นักศึกษา - วิทยาลัยอาชีวศึกษาเทคโนโลยีสารสนเทศ</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sarabun:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Prompt:wght@400;600&display=swap">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: 'Sarabun', sans-serif;
+      font-size: 14pt;
+      line-height: 1.6;
+      color: #000;
+      background: #e2e8f0;
+      padding: 20px;
+    }
+    .print-actions {
+      max-width: 210mm;
+      margin: 0 auto 15px auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #065f46;
+      color: white;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-family: 'Prompt', sans-serif;
+    }
+    .btn {
+      padding: 8px 18px;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      font-size: 14px;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-print {
+      background: #f59e0b;
+      color: #000;
+    }
+    .btn-close {
+      background: rgba(255,255,255,0.2);
+      color: white;
+    }
+    .sheet {
+      width: 210mm;
+      min-height: 297mm;
+      margin: 0 auto;
+      background: white;
+      padding: 20mm 20mm 15mm 20mm;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+      position: relative;
+    }
+    .doc-header {
+      text-align: center;
+      position: relative;
+      margin-bottom: 25px;
+    }
+    .doc-emblem {
+      width: 70px;
+      height: 70px;
+      margin: 0 auto 5px auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 40px;
+    }
+    .doc-title {
+      font-size: 18pt;
+      font-weight: 700;
+      line-height: 1.3;
+    }
+    .doc-subtitle {
+      font-size: 15pt;
+      font-weight: 600;
+    }
+    .top-meta {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 15px;
+      border: 1px solid #000;
+      padding: 10px 15px;
+      background: #fafafa;
+    }
+    .dots {
+      border-bottom: 1px dotted #000;
+      padding: 0 5px;
+      font-weight: 600;
+    }
+    .indent {
+      text-indent: 2.5cm;
+      text-align: justify;
+      margin-bottom: 12px;
+    }
+    .contract-rules {
+      margin: 15px 0 20px 1.5cm;
+      font-size: 13pt;
+    }
+    .contract-rules li {
+      margin-bottom: 6px;
+    }
+    .signature-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 25px 40px;
+      margin-top: 30px;
+      text-align: center;
+      font-size: 12pt;
+    }
+    .sig-line {
+      margin-top: 35px;
+      border-bottom: 1px dotted #000;
+      width: 85%;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      .print-actions {
+        display: none !important;
+      }
+      .sheet {
+        box-shadow: none;
+        margin: 0;
+        width: 100%;
+        min-height: 100%;
+        padding: 15mm 20mm;
+      }
+      @page {
+        size: A4;
+        margin: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="print-actions">
+    <div>
+      <strong>📑 หนังสือมอบตัวและสัญญาค้ำประกันนักเรียน นักศึกษา (A4)</strong>
+    </div>
+    <div style="display: flex; gap: 10px;">
+      <button onclick="window.print()" class="btn btn-print">🖨️ สั่งพิมพ์เอกสาร / บันทึกเป็น PDF</button>
+      <button onclick="window.close()" class="btn btn-close">ปิดหน้าต่าง</button>
+    </div>
+  </div>
+
+  <div class="sheet">
+    <!-- Header -->
+    <div class="doc-header">
+      <div class="doc-emblem">🏛️</div>
+      <div class="doc-title">หนังสือมอบตัวนักเรียน / นักศึกษา และสัญญาการศึกษา</div>
+      <div class="doc-subtitle">วิทยาลัยอาชีวศึกษาเทคโนโลยีสารสนเทศ</div>
+      <div style="font-size: 12pt; color: #333;">สำนักงานคณะกรรมการการอาชีวศึกษา กระทรวงศึกษาธิการ</div>
+    </div>
+
+    <!-- Top Metadata Box -->
+    <div class="top-meta">
+      <div>
+        รหัสประจำตัวนักเรียน/นักศึกษา: <strong id="docStudentId" style="font-size: 15pt; color: #000; letter-spacing: 1px;">-</strong>
+      </div>
+      <div>
+        เลขที่ใบสมัคร: <strong id="docAppId">-</strong> | วันที่มอบตัว: <span id="docEnrollDate">-</span>
+      </div>
+    </div>
+
+    <!-- Content -->
+    <div class="indent">
+      ทำที่ วิทยาลัยอาชีวศึกษาเทคโนโลยีสารสนเทศ
+    </div>
+
+    <div class="indent">
+      ข้าพเจ้า <span class="dots" id="docGuardianName">-</span> อายุ <span class="dots">.......</span> ปี
+      อาชีพ <span class="dots" id="docGuardianOcc">-</span> เบอร์โทรศัพท์ <span class="dots" id="docGuardianPhone">-</span>
+      อยู่บ้านเลขที่ <span class="dots" id="docAddress">-</span>
+      เกี่ยวข้องเป็น <span class="dots" id="docGuardianRel">-</span> ของนักเรียน/นักศึกษา
+    </div>
+
+    <div class="indent">
+      ขอมอบตัว <span class="dots" id="docStudentName" style="font-size: 15pt;">-</span>
+      เลขประจำตัวประชาชน <span class="dots" id="docNationalId" style="letter-spacing: 1.5px;">-</span>
+      เกิดวันที่ <span class="dots" id="docBirthDate">-</span> เข้าเป็นนักเรียน/นักศึกษาของวิทยาลัยอาชีวศึกษาเทคโนโลยีสารสนเทศ
+      ในระดับชั้น <span class="dots" id="docLevel">-</span> สาขาวิชา <span class="dots" id="docMajor" style="font-size: 14pt;">-</span>
+      ประจำปีการศึกษา <span class="dots" id="docYear">2569</span>
+    </div>
+
+    <div class="indent">
+      ในการนี้ ข้าพเจ้าในฐานะผู้ปกครองและนักเรียน/นักศึกษา ขอให้สัญญาไว้ต่อสถานศึกษา ดังนี้
+    </div>
+
+    <ol class="contract-rules">
+      <li>จะปฏิบัติตามกฎ ระเบียบ ข้อบังคับ และวินัยของวิทยาลัยฯ และกระทรวงศึกษาธิการ โดยเคร่งครัด</li>
+      <li>จะตั้งใจศึกษาเล่าเรียน เข้าร่วมกิจกรรมตามหลักสูตร และประพฤติตนอยู่ในศีลธรรมอันดีงาม</li>
+      <li>จะไม่เกี่ยวข้องกับสิ่งเสพติด การพนัน การทะเลาะวิวาท อาวุธ หรือการกระทำผิดกฎหมายทุกชนิด</li>
+      <li>ผู้ปกครองยินดีให้ความร่วมมือกับทางวิทยาลัยฯ ในการดูแล อบรมสั่งสอน และติดตามความประพฤติอย่างใกล้ชิด</li>
+      <li>หากนักเรียน/นักศึกษากระทำผิดระเบียบวินัย ยินยอมให้วิทยาลัยฯ พิจารณาลงโทษตามระเบียบสถานศึกษาทุกประการ</li>
+    </ol>
+
+    <div class="indent">
+      ข้าพเจ้าได้อ่านและเข้าใจข้อความในหนังสือมอบตัวนี้โดยตลอดแล้ว จึงได้ลงลายมือชื่อไว้เป็นหลักฐานต่อหน้าพยาน
+    </div>
+
+    <!-- Signatures (4 parts) -->
+    <div class="signature-grid">
+      <div>
+        <div class="sig-line"></div>
+        <p style="margin-top: 5px;">ลงชื่อ.......................................................ผู้มอบตัว (ผู้ปกครอง)</p>
+        <p>( <span id="sigGuardianName">...................................................</span> )</p>
+      </div>
+
+      <div>
+        <div class="sig-line"></div>
+        <p style="margin-top: 5px;">ลงชื่อ.......................................................นักเรียน/นักศึกษา</p>
+        <p>( <span id="sigStudentName">...................................................</span> )</p>
+      </div>
+
+      <div>
+        <div class="sig-line"></div>
+        <p style="margin-top: 5px;">ลงชื่อ.......................................................พยาน</p>
+        <p>( <span id="sigWitnessName">...................................................</span> )</p>
+      </div>
+
+      <div>
+        <div class="sig-line"></div>
+        <p style="margin-top: 5px;">ลงชื่อ.......................................................นายทะเบียน / ผู้รับมอบตัว</p>
+        <p>( ................................................... )</p>
+      </div>
+    </div>
+
+    <div style="margin-top: 25px; border-top: 1px dashed #999; padding-top: 8px; font-size: 10pt; color: #555; text-align: center;">
+      * เอกสารฉบับนี้พิมพ์จากระบบสารสนเทศงานทะเบียนนักศึกษา วิทยาลัยอาชีวศึกษาเทคโนโลยีสารสนเทศ เพื่อใช้เป็นหลักฐานการมอบตัวอย่างเป็นทางการ
+    </div>
+  </div>
+
+  <script src="./js/data-service.js"></script>
+  <script src="./js/validation.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const id = urlParams.get('id');
+
+      if (!id) {
+        alert('กรุณาระบุรหัสใบสมัคร');
+        return;
+      }
+
+      try {
+        const a = await DataService.getApplicant(id);
+
+        document.getElementById('docAppId').textContent = a.id;
+        document.getElementById('docStudentId').textContent = a.studentId || 'รอออกรหัสนักศึกษาในวันมอบตัว';
+        document.getElementById('docEnrollDate').textContent = a.enrollmentDate ? formatThaiDate(a.enrollmentDate) : formatThaiDate(new Date().toISOString().split('T')[0]);
+        document.getElementById('docYear').textContent = a.academicYear || '2569';
+
+        const fullName = `${a.prefix}${a.firstName} ${a.lastName}`;
+        document.getElementById('docStudentName').textContent = fullName;
+        document.getElementById('sigStudentName').textContent = fullName;
+
+        document.getElementById('docNationalId').textContent = formatThaiID(a.nationalId);
+        document.getElementById('docBirthDate').textContent = formatThaiDate(a.birthDate);
+        document.getElementById('docLevel').textContent = a.level;
+        document.getElementById('docMajor').textContent = a.major;
+        document.getElementById('docAddress').textContent = a.address || '-';
+
+        document.getElementById('docGuardianName').textContent = a.guardianName || '-';
+        document.getElementById('sigGuardianName').textContent = a.guardianName || '...................................................';
+        document.getElementById('docGuardianRel').textContent = a.guardianRelation || 'ผู้ปกครอง';
+        document.getElementById('docGuardianOcc').textContent = a.guardianOccupation || 'รับจ้าง/ค้าขาย';
+        document.getElementById('docGuardianPhone').textContent = formatPhone(a.guardianPhone || '');
+
+        document.getElementById('sigWitnessName').textContent = a.witnessName || 'อาจารย์ประจำงานทะเบียน';
+
+      } catch (err) {
+        alert(err.message);
+      }
+    });
+  </script>
+</body>
+</html>

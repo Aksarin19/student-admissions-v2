@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>แดชบอร์ดสถิติผู้สมัครเรียนแบบเรียลไทม์ (Admissions Analytics)</title>
-  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="./css/style.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📊</text></svg>">
 </head>
@@ -13,7 +13,7 @@
   <!-- Navbar -->
   <nav class="navbar">
     <div class="nav-container">
-      <a href="/dashboard.html" class="brand">
+      <a href="./dashboard.html" class="brand">
         <div class="brand-logo" style="background: linear-gradient(135deg, #0284c7, #2563eb);">📊</div>
         <div class="brand-text">
           <h1>แดชบอร์ดสถิติผู้สมัครเรียน (Admissions Analytics)</h1>
@@ -21,9 +21,9 @@
         </div>
       </a>
       <ul class="nav-links">
-        <li><a href="/admin.html">📋 ทะเบียนผู้สมัคร (Admin)</a></li>
-        <li><a href="/dashboard.html" class="active">📊 แดชบอร์ด</a></li>
-        <li><a href="/index.html" target="_blank">🌐 หน้าเว็บรับสมัคร</a></li>
+        <li><a href="./admin.html">📋 ทะเบียนผู้สมัคร (Admin)</a></li>
+        <li><a href="./dashboard.html" class="active">📊 แดชบอร์ด</a></li>
+        <li><a href="./index.html" target="_blank">🌐 หน้าเว็บรับสมัคร</a></li>
       </ul>
     </div>
   </nav>
@@ -139,6 +139,7 @@
 
   </div>
 
+  <script src="./js/data-service.js"></script>
   <script>
     let chartMajorInstance = null;
     let chartLevelInstance = null;
@@ -155,8 +156,7 @@
       btn.textContent = '⏳ กำลังโหลด...';
 
       try {
-        const res = await fetch('/api/stats/summary');
-        const data = await res.json();
+        const data = await DataService.getStats();
 
         // Update counts
         document.getElementById('dTotal').textContent = data.counts.total;

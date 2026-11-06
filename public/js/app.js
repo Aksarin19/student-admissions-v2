@@ -24,11 +24,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 });
 
-// Load config from server
+// Load config from DataService
 async function loadConfig() {
   try {
-    const res = await fetch('/api/config');
-    systemConfig = await res.json();
+    systemConfig = await DataService.getConfig();
     populateMajorDropdown();
   } catch (err) {
     console.error('Failed to load system config:', err);
@@ -42,7 +41,7 @@ function populateMajorDropdown() {
   if (!levelSelect || !majorSelect || !systemConfig) return;
 
   const selectedLevel = levelSelect.value || 'ปวช.';
-  const majors = systemConfig.majors[selectedLevel] || [];
+  const majors = (systemConfig.majors && systemConfig.majors[selectedLevel]) ? systemConfig.majors[selectedLevel] : [];
 
   majorSelect.innerHTML = '<option value="">-- กรุณาเลือกสาขาวิชา --</option>';
   majors.forEach(m => {
@@ -155,7 +154,6 @@ function setupUploadBoxes() {
       }
     });
 
-    // Drag & Drop
     ['dragenter', 'dragover'].forEach(eventName => {
       box.addEventListener(eventName, (e) => {
         e.preventDefault();
@@ -211,19 +209,10 @@ function setupFormSubmit() {
       return;
     }
 
-    // Validate required documents
     const photoInput = document.getElementById('filePhoto');
     const idCardInput = document.getElementById('fileIdCard');
-    if (!photoInput.files || photoInput.files.length === 0) {
-      showToast('กรุณาแนบไฟล์รูปถ่ายหน้าตรง', 'warning');
-      photoInput.scrollIntoView({ behavior: 'smooth' });
-      return;
-    }
-    if (!idCardInput.files || idCardInput.files.length === 0) {
-      showToast('กรุณาแนบไฟล์สำเนาบัตรประจำตัวประชาชน', 'warning');
-      idCardInput.scrollIntoView({ behavior: 'smooth' });
-      return;
-    }
+    const houseRegInput = document.getElementById('fileHouseReg');
+    const transcriptInput = document.getElementById('fileTranscript');
 
     const submitBtn = form.querySelector('button[type="submit"]');
     const originalText = submitBtn.innerHTML;
@@ -231,31 +220,25 @@ function setupFormSubmit() {
     submitBtn.innerHTML = '⏳ กำลังบันทึกข้อมูลและอัปโหลดเอกสาร...';
 
     const formData = new FormData(form);
-    // Add raw numbers
     formData.set('nationalId', nationalId);
     formData.set('phone', phone);
-    
-    // Add majorCode
+
     const selectedOption = majorSelect.options[majorSelect.selectedIndex];
     if (selectedOption && selectedOption.dataset.code) {
       formData.set('majorCode', selectedOption.dataset.code);
     }
 
+    const fileInputs = {
+      photo: photoInput.files ? photoInput.files[0] : null,
+      idCardCopy: idCardInput.files ? idCardInput.files[0] : null,
+      houseRegCopy: houseRegInput.files ? houseRegInput.files[0] : null,
+      transcriptCopy: transcriptInput.files ? transcriptInput.files[0] : null
+    };
+
     try {
-      const res = await fetch('/api/applicants', {
-        method: 'POST',
-        body: formData
-      });
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.error || 'เกิดข้อผิดพลาดในการบันทึก');
-      }
-
+      const newApplicant = await DataService.submitApplication(formData, fileInputs);
       showToast('สมัครเรียนสำเร็จเรียบร้อย!', 'success');
-
-      // Show success screen
-      renderSubmissionSuccess(data.data);
+      renderSubmissionSuccess(newApplicant);
     } catch (err) {
       showToast(err.message, 'error');
     } finally {
@@ -304,7 +287,7 @@ function renderSubmissionSuccess(applicant) {
       </div>
 
       <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
-        <a href="/print-application.html?id=${applicant.id}" target="_blank" class="btn btn-primary">
+        <a href="./print-application.html?id=${applicant.id}" target="_blank" class="btn btn-primary">
           📄 พิมพ์/ดาวน์โหลดใบสมัคร (PDF)
         </a>
         <button onclick="window.location.href='#status-check'; document.getElementById('searchNationalId').value='${applicant.nationalId}'; document.getElementById('btnSearchStatus').click();" class="btn btn-secondary">
@@ -349,12 +332,8 @@ function setupStatusSearch() {
     `;
 
     try {
-      const res = await fetch(`/api/applicants/${raw}`);
-      if (!res.ok) {
-        throw new Error('ไม่พบข้อมูลการสมัครเรียนด้วยเลขบัตรประชาชนนี้');
-      }
-      const data = await res.json();
-      renderStatusCard(data);
+      const applicant = await DataService.getApplicant(raw);
+      renderStatusCard(applicant);
     } catch (err) {
       resultContainer.innerHTML = `
         <div class="card" style="text-align: center; padding: 2rem; border-color: #fecaca; background: #fff5f5;">
@@ -419,19 +398,19 @@ function renderStatusCard(applicant) {
           <div class="grid-2" style="margin-bottom: 1rem;">
             <div>
               <label class="form-label">รูปถ่ายหน้าตรง</label>
-              <input type="file" name="photo" class="form-control" accept=".jpg,.jpeg,.png,.pdf">
+              <input type="file" id="rePhoto" class="form-control" accept=".jpg,.jpeg,.png,.pdf">
             </div>
             <div>
               <label class="form-label">สำเนาบัตรประชาชน</label>
-              <input type="file" name="idCardCopy" class="form-control" accept=".jpg,.jpeg,.png,.pdf">
+              <input type="file" id="reIdCard" class="form-control" accept=".jpg,.jpeg,.png,.pdf">
             </div>
             <div>
               <label class="form-label">สำเนาทะเบียนบ้าน</label>
-              <input type="file" name="houseRegCopy" class="form-control" accept=".jpg,.jpeg,.png,.pdf">
+              <input type="file" id="reHouseReg" class="form-control" accept=".jpg,.jpeg,.png,.pdf">
             </div>
             <div>
               <label class="form-label">ใบแสดงผลการเรียน (รบ./ปพ.1)</label>
-              <input type="file" name="transcriptCopy" class="form-control" accept=".jpg,.jpeg,.png,.pdf">
+              <input type="file" id="reTranscript" class="form-control" accept=".jpg,.jpeg,.png,.pdf">
             </div>
           </div>
           <button type="button" onclick="submitReupload('${applicant.id}')" class="btn btn-warning" style="width: 100%;">
@@ -523,11 +502,11 @@ function renderStatusCard(applicant) {
 
       <!-- Actions -->
       <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1.5rem;">
-        <a href="/print-application.html?id=${applicant.id}" target="_blank" class="btn btn-primary">
+        <a href="./print-application.html?id=${applicant.id}" target="_blank" class="btn btn-primary">
           📄 พิมพ์/ดาวน์โหลดใบสมัคร (PDF)
         </a>
         ${(applicant.status === 'ผ่านการคัดเลือก' || applicant.status === 'มอบตัวแล้ว') ? `
-          <a href="/print-enrollment.html?id=${applicant.id}" target="_blank" class="btn btn-success">
+          <a href="./print-enrollment.html?id=${applicant.id}" target="_blank" class="btn btn-success">
             📑 พิมพ์ใบมอบตัวและสัญญาค้ำประกัน (PDF)
           </a>
         ` : ''}
@@ -538,31 +517,20 @@ function renderStatusCard(applicant) {
 
 // Applicant re-upload handler
 async function submitReupload(applicantId) {
-  const form = document.getElementById('reuploadForm');
-  if (!form) return;
+  const photo = document.getElementById('rePhoto')?.files?.[0];
+  const idCardCopy = document.getElementById('reIdCard')?.files?.[0];
+  const houseRegCopy = document.getElementById('reHouseReg')?.files?.[0];
+  const transcriptCopy = document.getElementById('reTranscript')?.files?.[0];
 
-  const formData = new FormData(form);
-  // Check if at least 1 file is selected
-  let hasFile = false;
-  for (let [key, val] of formData.entries()) {
-    if (val && val.size > 0) hasFile = true;
-  }
-
-  if (!hasFile) {
+  if (!photo && !idCardCopy && !houseRegCopy && !transcriptCopy) {
     showToast('กรุณาเลือกไฟล์ที่ต้องการส่งใหม่อย่างน้อย 1 ไฟล์', 'warning');
     return;
   }
 
   try {
-    const res = await fetch(`/api/applicants/${applicantId}/update-documents`, {
-      method: 'POST',
-      body: formData
-    });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error || 'เกิดข้อผิดพลาด');
-
+    const res = await DataService.updateDocuments(applicantId, { photo, idCardCopy, houseRegCopy, transcriptCopy });
     showToast('ส่งเอกสารเพิ่มเติมเรียบร้อยแล้ว สถานะเปลี่ยนเป็นรอตรวจสอบ', 'success');
-    renderStatusCard(data.data);
+    renderStatusCard(res.data || res);
   } catch (err) {
     showToast(err.message, 'error');
   }

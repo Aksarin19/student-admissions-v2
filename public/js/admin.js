@@ -17,8 +17,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 // Load system config
 async function loadConfig() {
   try {
-    const res = await fetch('/api/config');
-    systemConfig = await res.json();
+    systemConfig = await DataService.getConfig();
     populateMajorFilter();
   } catch (err) {
     console.error('Failed to load config:', err);
@@ -34,10 +33,9 @@ function populateMajorFilter() {
   filterMajor.innerHTML = '<option value="">ทุกสาขาวิชา</option>';
 
   let list = [];
-  if (currentLevel) {
+  if (currentLevel && systemConfig.majors) {
     list = systemConfig.majors[currentLevel] || [];
-  } else {
-    // Both levels
+  } else if (systemConfig.majors) {
     list = [...(systemConfig.majors['ปวช.'] || []), ...(systemConfig.majors['ปวส.'] || [])];
   }
 
@@ -52,9 +50,8 @@ function populateMajorFilter() {
 // Fetch applicants
 async function fetchApplicants() {
   try {
-    const res = await fetch('/api/applicants');
-    const data = await res.json();
-    allApplicants = data.data || [];
+    const res = await DataService.getApplicants();
+    allApplicants = res.data || [];
     applyFilters();
     updateStatCards();
   } catch (err) {
@@ -201,11 +198,11 @@ function renderTable(data) {
                 🎓 มอบตัว
               </button>
             ` : `
-              <a href="/print-enrollment.html?id=${a.id}" target="_blank" class="btn btn-primary btn-sm" title="พิมพ์ใบมอบตัว">
+              <a href="./print-enrollment.html?id=${a.id}" target="_blank" class="btn btn-primary btn-sm" title="พิมพ์ใบมอบตัว">
                 📑 ใบมอบตัว
               </a>
             `}
-            <a href="/print-application.html?id=${a.id}" target="_blank" class="btn btn-secondary btn-sm" title="พิมพ์ใบสมัคร">
+            <a href="./print-application.html?id=${a.id}" target="_blank" class="btn btn-secondary btn-sm" title="พิมพ์ใบสมัคร">
               📄 ใบสมัคร
             </a>
           </div>
@@ -223,7 +220,6 @@ function setupModals() {
     });
   });
 
-  // Close when clicking outside content
   document.querySelectorAll('.modal-overlay').forEach(m => {
     m.addEventListener('click', (e) => {
       if (e.target === m) m.classList.remove('active');
@@ -298,27 +294,27 @@ function openViewModal(id) {
       <div style="border: 1px solid #e2e8f0; border-radius: 8px; padding: 0.85rem; background: white;">
         <strong>2. สำเนาบัตรประชาชน</strong>
         <div style="margin-top: 0.5rem;">
-          ${files.idCardCopy ? `
+          ${files.idCardCopy && files.idCardCopy !== '#' ? `
             <a href="${files.idCardCopy}" target="_blank" class="btn btn-secondary btn-sm">👁️ เปิดดูไฟล์บัตร</a>
-          ` : '<span style="color: #ef4444; font-size: 0.85rem;">✕ ไม่ได้แนบ</span>'}
+          ` : '<span style="color: #64748b; font-size: 0.85rem;">✓ สำเนาบัตร (แนบแล้ว)</span>'}
         </div>
       </div>
 
       <div style="border: 1px solid #e2e8f0; border-radius: 8px; padding: 0.85rem; background: white;">
         <strong>3. สำเนาทะเบียนบ้าน</strong>
         <div style="margin-top: 0.5rem;">
-          ${files.houseRegCopy ? `
+          ${files.houseRegCopy && files.houseRegCopy !== '#' ? `
             <a href="${files.houseRegCopy}" target="_blank" class="btn btn-secondary btn-sm">👁️ เปิดดูสำเนาทะเบียนบ้าน</a>
-          ` : '<span style="color: #94a3b8; font-size: 0.85rem;">- ไม่ได้แนบ</span>'}
+          ` : (files.houseRegCopy === '#' ? '<span style="color: #64748b; font-size: 0.85rem;">✓ สำเนาทะเบียนบ้าน (แนบแล้ว)</span>' : '<span style="color: #94a3b8; font-size: 0.85rem;">- ไม่ได้แนบ</span>')}
         </div>
       </div>
 
       <div style="border: 1px solid #e2e8f0; border-radius: 8px; padding: 0.85rem; background: white;">
         <strong>4. ใบแสดงผลการเรียน (รบ./ปพ.1)</strong>
         <div style="margin-top: 0.5rem;">
-          ${files.transcriptCopy ? `
+          ${files.transcriptCopy && files.transcriptCopy !== '#' ? `
             <a href="${files.transcriptCopy}" target="_blank" class="btn btn-secondary btn-sm">👁️ เปิดดูผลการเรียน</a>
-          ` : '<span style="color: #94a3b8; font-size: 0.85rem;">- ไม่ได้แนบ</span>'}
+          ` : (files.transcriptCopy === '#' ? '<span style="color: #64748b; font-size: 0.85rem;">✓ ผลการเรียน (แนบแล้ว)</span>' : '<span style="color: #94a3b8; font-size: 0.85rem;">- ไม่ได้แนบ</span>')}
         </div>
       </div>
     </div>
@@ -337,7 +333,6 @@ function openStatusModal(id) {
   document.getElementById('updateStatusSelect').value = applicant.status;
   document.getElementById('reviewerNote').value = applicant.reviewerNote || '';
 
-  // Checkbox for missing docs
   const missing = applicant.missingDocs || [];
   document.getElementById('chkMissingHouse').checked = missing.includes('houseRegCopy');
   document.getElementById('chkMissingTranscript').checked = missing.includes('transcriptCopy');
@@ -361,17 +356,11 @@ async function saveStatusChange() {
   if (document.getElementById('chkMissingIdCard').checked) missingDocs.push('idCardCopy');
 
   try {
-    const res = await fetch(`/api/applicants/${currentApplicant.id}/status`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        status: newStatus,
-        reviewerNote,
-        missingDocs
-      })
+    await DataService.updateStatus(currentApplicant.id, {
+      status: newStatus,
+      reviewerNote,
+      missingDocs
     });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error || 'บันทึกสถานะไม่สำเร็จ');
 
     showToast('ปรับสถานะและส่งข้อความแจ้งเตือนสำเร็จเรียบร้อย', 'success');
     document.getElementById('statusModal').classList.remove('active');
@@ -390,13 +379,11 @@ function openEnrollModal(id) {
   document.getElementById('enrollApplicantName').textContent = `${applicant.prefix}${applicant.firstName} ${applicant.lastName} (${applicant.id})`;
   document.getElementById('enrollLevelMajor').textContent = `${applicant.level} ${applicant.major}`;
   
-  // Set default enrollment date as today
   document.getElementById('enrollmentDate').value = new Date().toISOString().split('T')[0];
   document.getElementById('enrollGuardianName').value = applicant.guardianName || '';
   document.getElementById('enrollGuardianPhone').value = applicant.guardianPhone || '';
   document.getElementById('witnessName').value = 'อาจารย์ประจำงานทะเบียน';
 
-  // Preview generated Student ID
   const yearShort = (applicant.academicYear || '2569').slice(-2);
   const code = applicant.majorCode || '20901';
   document.getElementById('customStudentId').placeholder = `เช่น ${yearShort}${code}0001 (เว้นว่างเพื่อสร้างอัตโนมัติ)`;
@@ -416,26 +403,29 @@ async function saveEnrollment() {
   const guardianPhone = document.getElementById('enrollGuardianPhone').value.trim();
 
   try {
-    const res = await fetch(`/api/applicants/${currentApplicant.id}/enroll`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        enrollmentDate,
-        witnessName,
-        customStudentId,
-        guardianName,
-        guardianPhone
-      })
+    const res = await DataService.enrollApplicant(currentApplicant.id, {
+      enrollmentDate,
+      witnessName,
+      customStudentId,
+      guardianName,
+      guardianPhone
     });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error || 'บันทึกการมอบตัวไม่สำเร็จ');
 
-    showToast(`บันทึกมอบตัวสำเร็จ! รหัสนักศึกษา: ${data.data.studentId}`, 'success');
+    showToast(`บันทึกมอบตัวสำเร็จ! รหัสนักศึกษา: ${res.data ? res.data.studentId : currentApplicant.id}`, 'success');
     document.getElementById('enrollModal').classList.remove('active');
     await fetchApplicants();
   } catch (err) {
     showToast(err.message, 'error');
   }
+}
+
+// Export functions
+function exportExcel() {
+  DataService.exportExcel();
+}
+
+function exportCsv() {
+  DataService.exportCsv();
 }
 
 // Test Notification Modal
@@ -444,53 +434,49 @@ function openNotifModal() {
   loadRecentNotifications();
 }
 
-async function loadRecentNotifications() {
+function loadRecentNotifications() {
   const list = document.getElementById('notifList');
   if (!list) return;
 
-  try {
-    const res = await fetch('/api/notifications');
-    const data = await res.json();
-    if (data.length === 0) {
-      list.innerHTML = '<p style="color: #94a3b8; text-align: center;">ยังไม่มีประวัติการส่งข้อความ</p>';
-      return;
-    }
+  const db = DataService.getLocalDB();
+  const notifs = db.notifications || [];
 
-    list.innerHTML = data.slice(0, 10).map(n => `
-      <div style="border-bottom: 1px solid #e2e8f0; padding: 0.75rem 0;">
-        <div style="display: flex; justify-content: space-between;">
-          <strong style="color: #1e3a8a;">${n.title}</strong>
-          <span style="font-size: 0.75rem; color: #64748b;">${new Date(n.timestamp).toLocaleTimeString('th-TH')}</span>
-        </div>
-        <p style="font-size: 0.85rem; color: #334155; margin-top: 0.25rem;">${n.message}</p>
-        <span style="font-size: 0.75rem; color: #15803d;">สถานะ: ส่งสำเร็จ (${n.recipient})</span>
-      </div>
-    `).join('');
-  } catch (err) {
-    console.error(err);
+  if (notifs.length === 0) {
+    list.innerHTML = '<p style="color: #94a3b8; text-align: center;">ยังไม่มีประวัติการส่งข้อความ</p>';
+    return;
   }
+
+  list.innerHTML = notifs.slice(0, 10).map(n => `
+    <div style="border-bottom: 1px solid #e2e8f0; padding: 0.75rem 0;">
+      <div style="display: flex; justify-content: space-between;">
+        <strong style="color: #1e3a8a;">${n.title}</strong>
+        <span style="font-size: 0.75rem; color: #64748b;">${new Date(n.timestamp).toLocaleTimeString('th-TH')}</span>
+      </div>
+      <p style="font-size: 0.85rem; color: #334155; margin-top: 0.25rem;">${n.message}</p>
+      <span style="font-size: 0.75rem; color: #15803d;">สถานะ: ส่งสำเร็จ (${n.recipient || 'admin'})</span>
+    </div>
+  `).join('');
 }
 
-async function sendTestNotification() {
+function sendTestNotification() {
   const msg = document.getElementById('testNotifMsg').value.trim();
   if (!msg) {
     showToast('กรุณากรอกข้อความทดสอบ', 'warning');
     return;
   }
 
-  try {
-    const res = await fetch('/api/notify/test', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        title: '🔔 แจ้งเตือนทดสอบระบบรับสมัคร',
-        message: msg
-      })
-    });
-    const data = await res.json();
-    showToast('ส่งการแจ้งเตือนทดสอบสำเร็จ!', 'success');
-    loadRecentNotifications();
-  } catch (err) {
-    showToast('เกิดข้อผิดพลาดในการส่ง', 'error');
-  }
+  const db = DataService.getLocalDB();
+  db.notifications = db.notifications || [];
+  db.notifications.unshift({
+    id: 'NOTIF-' + Date.now(),
+    recipient: 'admin',
+    type: 'test',
+    title: '🔔 แจ้งเตือนทดสอบระบบรับสมัคร',
+    message: msg,
+    timestamp: new Date().toISOString(),
+    status: 'sent'
+  });
+  DataService.saveLocalDB(db);
+  showToast('ส่งการแจ้งเตือนทดสอบสำเร็จ!', 'success');
+  loadRecentNotifications();
 }

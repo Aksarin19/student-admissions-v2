@@ -4,7 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ระบบบริหารจัดการข้อมูลผู้สมัครเรียน (Admin Portal)</title>
-  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="./css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚙️</text></svg>">
 </head>
 <body style="background-color: #f1f5f9;">
@@ -12,7 +13,7 @@
   <!-- Navbar -->
   <nav class="navbar" style="border-bottom: 2px solid #cbd5e1;">
     <div class="nav-container">
-      <a href="/admin.html" class="brand">
+      <a href="./admin.html" class="brand">
         <div class="brand-logo" style="background: linear-gradient(135deg, #0f172a, #1e3a8a);">⚙️</div>
         <div class="brand-text">
           <h1>ระบบงานเจ้าหน้าที่และงานทะเบียน (Admin Portal)</h1>
@@ -20,9 +21,9 @@
         </div>
       </a>
       <ul class="nav-links">
-        <li><a href="/admin.html" class="active">📋 ทะเบียนผู้สมัคร</a></li>
-        <li><a href="/dashboard.html">📊 แดชบอร์ดสถิติ</a></li>
-        <li><a href="/index.html" target="_blank">🌐 ไปยังหน้าเว็บรับสมัคร</a></li>
+        <li><a href="./admin.html" class="active">📋 ทะเบียนผู้สมัคร</a></li>
+        <li><a href="./dashboard.html">📊 แดชบอร์ดสถิติ</a></li>
+        <li><a href="./index.html" target="_blank">🌐 ไปยังหน้าเว็บรับสมัคร</a></li>
       </ul>
     </div>
   </nav>
@@ -39,12 +40,12 @@
         <button onclick="openNotifModal()" class="btn btn-warning btn-sm">
           🔔 ระบบแจ้งเตือน (LINE)
         </button>
-        <a href="/api/export/excel" class="btn btn-success btn-sm">
+        <button onclick="exportExcel()" class="btn btn-success btn-sm">
           📊 ส่งออกไฟล์ Excel (ศธ.02)
-        </a>
-        <a href="/api/export/csv" class="btn btn-secondary btn-sm">
+        </button>
+        <button onclick="exportCsv()" class="btn btn-secondary btn-sm">
           📄 ส่งออก CSV
-        </a>
+        </button>
       </div>
     </div>
 
@@ -312,7 +313,8 @@
     </div>
   </div>
 
-  <script src="/js/validation.js"></script>
-  <script src="/js/admin.js"></script>
+  <script src="./js/data-service.js"></script>
+  <script src="./js/validation.js"></script>
+  <script src="./js/admin.js"></script>
 </body>
 </html>

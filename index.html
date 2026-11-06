@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ระบบรับสมัครเรียนออนไลน์ - วิทยาลัยอาชีวศึกษาเทคโนโลยีสารสนเทศ</title>
+  <link rel="stylesheet" href="./css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎓</text></svg>">
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="./index.html" class="brand">
+        <div class="brand-logo">🎓</div>
+        <div class="brand-text">
+          <h1>วิทยาลัยอาชีวศึกษาเทคโนโลยีสารสนเทศ</h1>
+          <p>ระบบรับสมัครเรียนออนไลน์ ประจำปีการศึกษา 2569</p>
+        </div>
+      </a>
+      <ul class="nav-links">
+        <li><a href="#registration" class="active">ยื่นใบสมัคร</a></li>
+        <li><a href="#status-check">ตรวจสอบสถานะ</a></li>
+        <li><a href="#schedule">กำหนดการ</a></li>
+        <li><a href="./dashboard.html">สถิติผู้สมัคร</a></li>
+        <li><a href="./admin.html" class="nav-btn-admin">⚙️ สำหรับเจ้าหน้าที่</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <div class="container">
+
+    <!-- Hero Section -->
+    <div class="hero">
+      <div class="hero-content">
+        <span class="hero-badge">📢 เปิดรับสมัครนักเรียน-นักศึกษาใหม่ ประจำปีการศึกษา 2569</span>
+        <h2>ก้าวสู่อนาคตวิชาชีพที่มั่นคง กับวิทยาลัยอาชีวศึกษาชั้นนำ</h2>
+        <p>
+          เปิดรับสมัครระดับ <strong>ประกาศนียบัตรวิชาชีพ (ปวช.)</strong> และ <strong>ประกาศนียบัตรวิชาชีพชั้นสูง (ปวส.)</strong> 
+          กรอกข้อมูลง่าย ตรวจสอบความถูกต้องอัตโนมัติ รู้ผลการสมัครทันใจ และพิมพ์ใบสมัครได้ทันที
+        </p>
+        <div class="hero-actions">
+          <a href="#registration" class="btn btn-warning">📝 กรอกใบสมัครออนไลน์</a>
+          <a href="#status-check" class="btn btn-outline-white">🔍 ตรวจสอบสถานะการสมัคร</a>
+          <a href="./admin.html" class="btn btn-outline-white">🔐 ระบบงานเจ้าหน้าที่</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Status Tracking Section -->
+    <section id="status-check" style="margin-bottom: 3rem;">
+      <div class="card" style="border-top: 4px solid var(--primary-light);">
+        <div class="card-header">
+          <div>
+            <h2 class="card-title">🔍 ตรวจสอบสถานะการสมัครเรียน</h2>
+            <p class="card-desc">กรอกเลขประจำตัวประชาชน 13 หลัก เพื่อตรวจสอบความคืบหน้าของเอกสารหรือพิมพ์เอกสารมอบตัว</p>
+          </div>
+        </div>
+        <div style="max-width: 650px; margin: 0 auto;">
+          <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+            <div style="flex: 1; min-width: 250px;">
+              <input type="text" id="searchNationalId" class="form-control" placeholder="X-XXXX-XXXXX-XX-X (เลขบัตรประชาชน 13 หลัก)" maxlength="17" style="font-size: 1.1rem; padding: 0.75rem 1rem;">
+            </div>
+            <button type="button" id="btnSearchStatus" class="btn btn-primary" style="padding: 0.75rem 1.5rem;">
+              ค้นหาข้อมูล
+            </button>
+          </div>
+          <div style="font-size: 0.8rem; color: #64748b; margin-top: 0.5rem;">
+            💡 ตัวอย่างทดสอบ: 1-1037-02589-41-1 (มอบตัวแล้ว) หรือ 2-3098-00561-23-4 (เอกสารไม่ครบ)
+          </div>
+        </div>
+
+        <!-- Result Container -->
+        <div id="statusResult"></div>
+      </div>
+    </section>
+
+    <!-- Registration Section -->
+    <section id="registration">
+      <div class="card" id="formCard">
+        <div class="card-header">
+          <div>
+            <h2 class="card-title">📝 แบบฟอร์มใบสมัครเรียนออนไลน์ ประจำปีการศึกษา 2569</h2>
+            <p class="card-desc">กรุณากรอกข้อมูลให้ครบถ้วนและถูกต้องตามความเป็นจริง ข้อมูลจะถูกตรวจสอบอัตโนมัติ</p>
+          </div>
+          <span class="badge badge-pending">รับสมัครรอบโควตา / รอบทั่วไป</span>
+        </div>
+
+        <form id="applicationForm" enctype="multipart/form-data">
+
+          <!-- ส่วนที่ 1: ข้อมูลส่วนตัวของผู้สมัคร -->
+          <div class="form-section">
+            <h3 class="form-section-title">👤 ส่วนที่ 1 : ข้อมูลส่วนตัวของผู้สมัคร</h3>
+            
+            <div class="grid-3">
+              <div class="form-group">
+                <label class="form-label required" for="nationalId">เลขประจำตัวประชาชน (13 หลัก)</label>
+                <input type="text" id="nationalId" name="nationalId" class="form-control" placeholder="X-XXXX-XXXXX-XX-X" maxlength="17" required>
+                <div id="nationalIdFeedback" class="validation-feedback"></div>
+              </div>
+              <div class="form-group">
+                <label class="form-label required" for="prefix">คำนำหน้าชื่อ</label>
+                <select id="prefix" name="prefix" class="form-control" required>
+                  <option value="นาย">นาย</option>
+                  <option value="นางสาว">นางสาว</option>
+                  <option value="เด็กชาย">เด็กชาย</option>
+                  <option value="เด็กหญิง">เด็กหญิง</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label required" for="firstName">ชื่อจริง</label>
+                <input type="text" id="firstName" name="firstName" class="form-control" placeholder="เช่น กฤษฎา" required>
+              </div>
+            </div>
+
+            <div class="grid-3">
+              <div class="form-group">
+                <label class="form-label required" for="lastName">นามสกุล</label>
+                <input type="text" id="lastName" name="lastName" class="form-control" placeholder="เช่น รุ่งโรจน์สกุล" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label required" for="birthDate">วันเดือนปีเกิด</label>
+                <input type="date" id="birthDate" name="birthDate" class="form-control" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label required" for="phone">เบอร์โทรศัพท์มือถือ (10 หลัก)</label>
+                <input type="tel" id="phone" name="phone" class="form-control" placeholder="0XX-XXX-XXXX" maxlength="12" required>
+                <div id="phoneFeedback" class="validation-feedback"></div>
+              </div>
+            </div>
+
+            <div class="grid-3">
+              <div class="form-group">
+                <label class="form-label" for="email">อีเมล (ถ้ามี)</label>
+                <input type="email" id="email" name="email" class="form-control" placeholder="student@example.com">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="nationality">สัญชาติ</label>
+                <input type="text" id="nationality" name="nationality" class="form-control" value="ไทย">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="religion">ศาสนา</label>
+                <select id="religion" name="religion" class="form-control">
+                  <option value="พุทธ">พุทธ</option>
+                  <option value="อิสลาม">อิสลาม</option>
+                  <option value="คริสต์">คริสต์</option>
+                  <option value="อื่นๆ">อื่นๆ</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label required" for="address">ที่อยู่ปัจจุบันตามทะเบียนบ้าน</label>
+              <textarea id="address" name="address" class="form-control" rows="2" placeholder="บ้านเลขที่, หมู่ที่, ซอย, ถนน, ตำบล/แขวง, อำเภอ/เขต, จังหวัด, รหัสไปรษณีย์" required></textarea>
+            </div>
+          </div>
+
+          <!-- ส่วนที่ 2: ระดับชั้น สาขาวิชา และประวัติการศึกษา -->
+          <div class="form-section">
+            <h3 class="form-section-title">🎓 ส่วนที่ 2 : ระดับชั้น สาขาวิชา และประวัติการศึกษาเดิม</h3>
+            
+            <div class="grid-2">
+              <div class="form-group">
+                <label class="form-label required" for="level">ระดับชั้นที่ต้องการสมัคร</label>
+                <select id="level" name="level" class="form-control" required>
+                  <option value="ปวช.">ปวช. (ประกาศนียบัตรวิชาชีพ - รับผู้จบ ม.3)</option>
+                  <option value="ปวส.">ปวส. (ประกาศนียบัตรวิชาชีพชั้นสูง - รับผู้จบ ปวช./ม.6)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label required" for="major">สาขาวิชาที่เลือกสมัคร</label>
+                <select id="major" name="major" class="form-control" required>
+                  <option value="">-- กรุณาเลือกสาขาวิชา --</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="grid-3">
+              <div class="form-group">
+                <label class="form-label required" for="previousSchool">สถานศึกษาเดิมที่สำเร็จการศึกษา</label>
+                <input type="text" id="previousSchool" name="previousSchool" class="form-control" placeholder="เช่น โรงเรียนเทศบาล 1" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label required" for="previousSchoolProvince">จังหวัดของสถานศึกษาเดิม</label>
+                <input type="text" id="previousSchoolProvince" name="previousSchoolProvince" class="form-control" placeholder="เช่น นครปฐม, กรุงเทพฯ" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label required" for="gpax">เกรดเฉลี่ยสะสม (GPAX)</label>
+                <input type="number" id="gpax" name="gpax" step="0.01" min="0.00" max="4.00" class="form-control" placeholder="เช่น 3.50" required>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="referralSource">ช่องทางที่ทราบข่าวการรับสมัคร / ผู้แนะนำ</label>
+              <select id="referralSource" name="referralSource" class="form-control">
+                <option value="อาจารย์แนะแนวมาที่โรงเรียน">อาจารย์แนะแนวมาที่โรงเรียนเดิม</option>
+                <option value="Facebook แฟนเพจวิทยาลัย">Facebook แฟนเพจวิทยาลัย</option>
+                <option value="TikTok / โซเชียลมีเดีย">TikTok / โซเชียลมีเดีย</option>
+                <option value="เพื่อนหรือรุ่นพี่แนะนำ">เพื่อนหรือรุ่นพี่แนะนำ</option>
+                <option value="ป้ายประชาสัมพันธ์ / ไวนิล">ป้ายประชาสัมพันธ์ / ไวนิล</option>
+                <option value="เว็บไซต์วิทยาลัย">เว็บไซต์วิทยาลัย</option>
+                <option value="อื่นๆ">อื่นๆ</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- ส่วนที่ 3: ข้อมูลผู้ปกครอง -->
+          <div class="form-section">
+            <h3 class="form-section-title">👨‍👩‍👦 ส่วนที่ 3 : ข้อมูลผู้ปกครอง</h3>
+            
+            <div class="grid-2">
+              <div class="form-group">
+                <label class="form-label required" for="guardianName">ชื่อ-นามสกุล ผู้ปกครอง</label>
+                <input type="text" id="guardianName" name="guardianName" class="form-control" placeholder="เช่น นายสมชาย ใจดี" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label required" for="guardianRelation">ความสัมพันธ์กับผู้สมัคร</label>
+                <select id="guardianRelation" name="guardianRelation" class="form-control" required>
+                  <option value="บิดา">บิดา</option>
+                  <option value="มารดา">มารดา</option>
+                  <option value="ปู่/ย่า/ตา/ยาย">ปู่ / ย่า / ตา / ยาย</option>
+                  <option value="ลุง/ป้า/น้า/อา">ลุง / ป้า / น้า / อา</option>
+                  <option value="อื่นๆ">อื่นๆ</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="grid-2">
+              <div class="form-group">
+                <label class="form-label required" for="guardianPhone">เบอร์โทรศัพท์ผู้ปกครอง</label>
+                <input type="tel" id="guardianPhone" name="guardianPhone" class="form-control" placeholder="0XX-XXX-XXXX" maxlength="12" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="guardianOccupation">อาชีพของผู้ปกครอง</label>
+                <input type="text" id="guardianOccupation" name="guardianOccupation" class="form-control" placeholder="เช่น ค้าขาย, ข้าราชการ, เกษตรกร">
+              </div>
+            </div>
+          </div>
+
+          <!-- ส่วนที่ 4: อัปโหลดเอกสารหลักฐาน -->
+          <div class="form-section">
+            <h3 class="form-section-title">📎 ส่วนที่ 4 : อัปโหลดเอกสารหลักฐานประกอบการสมัคร</h3>
+            <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 1.25rem;">
+              รองรับไฟล์ประเภท <strong>.JPG, .PNG, .PDF</strong> ขนาดไม่เกิน <strong>5 MB</strong> ต่อไฟล์ (สามารถถ่ายภาพจากมือถือหรือสแกนไฟล์ได้)
+            </p>
+
+            <div class="grid-2">
+              <div class="upload-box" id="boxPhoto">
+                <div class="upload-icon">📷</div>
+                <strong>รูปถ่ายหน้าตรง (บังคับ) *</strong>
+                <p class="upload-meta">รูปถ่ายหน้าตรงชุดนักเรียน หรือชุดสุภาพ หน้าตรงไม่สวมหมวก</p>
+                <div class="upload-filename">คลิกเพื่อเลือกไฟล์ หรือลากไฟล์มาวาง</div>
+                <input type="file" id="filePhoto" name="photo" accept=".jpg,.jpeg,.png,.pdf" style="display: none;" required>
+              </div>
+
+              <div class="upload-box" id="boxIdCard">
+                <div class="upload-icon">🪪</div>
+                <strong>สำเนาบัตรประจำตัวประชาชน (บังคับ) *</strong>
+                <p class="upload-meta">ถ่ายภาพด้านหน้าบัตรชัดเจน พร้อมลงชื่อสำเนาถูกต้อง (ถ้ามี)</p>
+                <div class="upload-filename">คลิกเพื่อเลือกไฟล์ หรือลากไฟล์มาวาง</div>
+                <input type="file" id="fileIdCard" name="idCardCopy" accept=".jpg,.jpeg,.png,.pdf" style="display: none;" required>
+              </div>
+
+              <div class="upload-box" id="boxHouseReg">
+                <div class="upload-icon">🏠</div>
+                <strong>สำเนาทะเบียนบ้าน (ผู้สมัคร)</strong>
+                <p class="upload-meta">หน้าที่มีชื่อผู้สมัครและหน้าเจ้าบ้านชัดเจน</p>
+                <div class="upload-filename">คลิกเพื่อเลือกไฟล์ หรือลากไฟล์มาวาง</div>
+                <input type="file" id="fileHouseReg" name="houseRegCopy" accept=".jpg,.jpeg,.png,.pdf" style="display: none;">
+              </div>
+
+              <div class="upload-box" id="boxTranscript">
+                <div class="upload-icon">📑</div>
+                <strong>ใบแสดงผลการเรียน (ปพ.1 หรือ รบ.)</strong>
+                <p class="upload-meta">ใบ ปพ.1 หรือระเบียนแสดงผลการเรียน (อย่างน้อย 5 ภาคเรียน)</p>
+                <div class="upload-filename">คลิกเพื่อเลือกไฟล์ หรือลากไฟล์มาวาง</div>
+                <input type="file" id="fileTranscript" name="transcriptCopy" accept=".jpg,.jpeg,.png,.pdf" style="display: none;">
+              </div>
+            </div>
+          </div>
+
+          <!-- เงื่อนไขและการยอมรับ -->
+          <div style="background: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem;">
+            <label style="display: flex; gap: 0.6rem; align-items: flex-start; cursor: pointer; font-size: 0.92rem; color: #92400e;">
+              <input type="checkbox" id="acceptConsent" required style="margin-top: 0.25rem;">
+              <span>ข้าพเจ้าขอรับรองว่าข้อมูลและเอกสารหลักฐานทั้งหมดที่แนบมานี้เป็นความจริงทุกประการ หากตรวจพบว่าข้อมูลไม่ตรงกับความเป็นจริง ข้าพเจ้ายินยอมให้ตัดสิทธิ์การสมัครเข้าศึกษาต่อทันที</span>
+            </label>
+          </div>
+
+          <!-- Submit Buttons -->
+          <div style="display: flex; justify-content: flex-end; gap: 1rem;">
+            <button type="reset" class="btn btn-secondary">ล้างข้อมูล</button>
+            <button type="submit" class="btn btn-primary" style="padding: 0.8rem 2.5rem; font-size: 1.05rem;">
+              🚀 ยืนยันการส่งใบสมัคร
+            </button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- Schedule Section -->
+    <section id="schedule" style="margin-top: 3rem; margin-bottom: 3rem;">
+      <div class="card">
+        <h3 class="card-title">📅 กำหนดการและขั้นตอนการรับสมัครเรียน</h3>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; margin-top: 1.5rem;">
+          <div style="border-left: 3px solid #2563eb; padding-left: 1rem;">
+            <strong style="color: #1e40af; font-size: 1.1rem;">1. ยื่นใบสมัครออนไลน์</strong>
+            <p style="color: #64748b; font-size: 0.9rem; margin-top: 0.25rem;">กรอกข้อมูล ตรวจสอบเลขบัตรประชาชน และแนบเอกสารหลักฐานผ่านหน้าเว็บได้ 24 ชั่วโมง</p>
+          </div>
+          <div style="border-left: 3px solid #f59e0b; padding-left: 1rem;">
+            <strong style="color: #b45309; font-size: 1.1rem;">2. เจ้าหน้าที่ตรวจเอกสาร</strong>
+            <p style="color: #64748b; font-size: 0.9rem; margin-top: 0.25rem;">เจ้าหน้าที่งานทะเบียนตรวจสอบความถูกต้องภายใน 1-2 วันทำการ หากไม่ครบถ้วนสามารถอัปโหลดแก้ไขได้</p>
+          </div>
+          <div style="border-left: 3px solid #10b981; padding-left: 1rem;">
+            <strong style="color: #047857; font-size: 1.1rem;">3. ประกาศผล & มอบตัว</strong>
+            <p style="color: #64748b; font-size: 0.9rem; margin-top: 0.25rem;">ผู้สมัครพิมพ์ใบสมัครและใบมอบตัวอัตโนมัติ (PDF) นำมายื่นในวันมอบตัวเพื่อรับรหัสนักศึกษา</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- Footer -->
+  <footer style="background: #0f172a; color: #94a3b8; padding: 2.5rem 1.5rem; border-top: 1px solid #1e293b; text-align: center; font-size: 0.9rem;">
+    <div style="max-width: 1200px; margin: 0 auto;">
+      <p style="color: #e2e8f0; font-weight: 600; margin-bottom: 0.5rem;">วิทยาลัยอาชีวศึกษาเทคโนโลยีสารสนเทศ</p>
+      <p style="margin-bottom: 1rem;">สังกัดสำนักงานคณะกรรมการการอาชีวศึกษา (สอศ.) กระทรวงศึกษาธิการ</p>
+      <p>© 2026 Student Admission System V2 - พัฒนาเพื่อการบริหารงานรับสมัครเรียนออนไลน์ครบวงจร</p>
+    </div>
+  </footer>
+
+  <script src="./js/data-service.js"></script>
+  <script src="./js/validation.js"></script>
+  <script src="./js/app.js"></script>
+</body>
+</html>

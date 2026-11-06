@@ -320,7 +320,8 @@
     </div>
   </div>
 
-  <script src="/js/validation.js"></script>
+  <script src="./js/data-service.js"></script>
+  <script src="./js/validation.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', async () => {
       const urlParams = new URLSearchParams(window.location.search);
@@ -332,9 +333,7 @@
       }
 
       try {
-        const res = await fetch(`/api/applicants/${id}`);
-        if (!res.ok) throw new Error('ไม่พบข้อมูลใบสมัคร');
-        const a = await res.json();
+        const a = await DataService.getApplicant(id);
 
         document.getElementById('docId').textContent = a.id;
         document.getElementById('docDate').textContent = formatThaiDate(a.createdAt ? a.createdAt.split('T')[0] : '');
