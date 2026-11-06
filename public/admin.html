@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ระบบบริหารจัดการข้อมูลผู้สมัครเรียน (Admin Portal)</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚙️</text></svg>">
+</head>
+<body style="background-color: #f1f5f9;">
+
+  <!-- Navbar -->
+  <nav class="navbar" style="border-bottom: 2px solid #cbd5e1;">
+    <div class="nav-container">
+      <a href="/admin.html" class="brand">
+        <div class="brand-logo" style="background: linear-gradient(135deg, #0f172a, #1e3a8a);">⚙️</div>
+        <div class="brand-text">
+          <h1>ระบบงานเจ้าหน้าที่และงานทะเบียน (Admin Portal)</h1>
+          <p>วิทยาลัยอาชีวศึกษาเทคโนโลยีสารสนเทศ • จัดการผู้สมัคร & ระบบมอบตัว</p>
+        </div>
+      </a>
+      <ul class="nav-links">
+        <li><a href="/admin.html" class="active">📋 ทะเบียนผู้สมัคร</a></li>
+        <li><a href="/dashboard.html">📊 แดชบอร์ดสถิติ</a></li>
+        <li><a href="/index.html" target="_blank">🌐 ไปยังหน้าเว็บรับสมัคร</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <div class="container">
+
+    <!-- Header & Action Toolbar -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+      <div>
+        <h2 style="font-size: 1.6rem; color: #0f172a; font-weight: 700;">รายชื่อผู้สมัครเรียน ประจำปีการศึกษา 2569</h2>
+        <p style="color: #64748b; font-size: 0.95rem;">ตรวจสอบเอกสาร ปรับสถานะการสมัคร จัดการการมอบตัว และส่งออกข้อมูลเข้าสู่ระบบ ศธ.02</p>
+      </div>
+      <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+        <button onclick="openNotifModal()" class="btn btn-warning btn-sm">
+          🔔 ระบบแจ้งเตือน (LINE)
+        </button>
+        <a href="/api/export/excel" class="btn btn-success btn-sm">
+          📊 ส่งออกไฟล์ Excel (ศธ.02)
+        </a>
+        <a href="/api/export/csv" class="btn btn-secondary btn-sm">
+          📄 ส่งออก CSV
+        </a>
+      </div>
+    </div>
+
+    <!-- Quick Stats Summary Cards -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon" style="background: #eff6ff; color: #1d4ed8;">👥</div>
+        <div>
+          <div class="stat-val" id="statTotal">0</div>
+          <div class="stat-lbl">ผู้สมัครทั้งหมด</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background: #fffbeb; color: #b45309;">⏳</div>
+        <div>
+          <div class="stat-val" id="statPending">0</div>
+          <div class="stat-lbl">รอตรวจสอบเอกสาร</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background: #fef2f2; color: #b91c1c;">⚠️</div>
+        <div>
+          <div class="stat-val" id="statIncomplete">0</div>
+          <div class="stat-lbl">เอกสารไม่ครบ</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background: #f0f9ff; color: #0284c7;">🎉</div>
+        <div>
+          <div class="stat-val" id="statPassed">0</div>
+          <div class="stat-lbl">ผ่านการคัดเลือก</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background: #f0fdf4; color: #15803d;">🎓</div>
+        <div>
+          <div class="stat-val" id="statEnrolled">0</div>
+          <div class="stat-lbl">มอบตัวสำเร็จแล้ว</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filters & Search Toolbar -->
+    <div class="card" style="padding: 1.25rem; margin-bottom: 1.5rem;">
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; align-items: end;">
+        <div>
+          <label class="form-label" style="font-size: 0.85rem;">🔍 ค้นหาผู้สมัคร</label>
+          <input type="text" id="filterSearch" class="form-control" placeholder="ชื่อ, เลขบัตร, รหัส, ร.ร.เดิม...">
+        </div>
+        <div>
+          <label class="form-label" style="font-size: 0.85rem;">📅 ปีการศึกษา</label>
+          <select id="filterYear" class="form-control">
+            <option value="2569">2569</option>
+            <option value="">ทุกปีการศึกษา</option>
+          </select>
+        </div>
+        <div>
+          <label class="form-label" style="font-size: 0.85rem;">🎓 ระดับชั้น</label>
+          <select id="filterLevel" class="form-control">
+            <option value="">ทุกระดับชั้น</option>
+            <option value="ปวช.">ปวช.</option>
+            <option value="ปวส.">ปวส.</option>
+          </select>
+        </div>
+        <div>
+          <label class="form-label" style="font-size: 0.85rem;">📚 สาขาวิชา</label>
+          <select id="filterMajor" class="form-control">
+            <option value="">ทุกสาขาวิชา</option>
+          </select>
+        </div>
+        <div>
+          <label class="form-label" style="font-size: 0.85rem;">📌 สถานะ</label>
+          <select id="filterStatus" class="form-control">
+            <option value="">ทุกสถานะ</option>
+            <option value="รอตรวจสอบ">รอตรวจสอบ</option>
+            <option value="เอกสารไม่ครบ">เอกสารไม่ครบ</option>
+            <option value="ผ่านการคัดเลือก">ผ่านการคัดเลือก</option>
+            <option value="มอบตัวแล้ว">มอบตัวแล้ว</option>
+            <option value="สละสิทธิ์">สละสิทธิ์</option>
+          </select>
+        </div>
+        <div>
+          <button type="button" id="btnResetFilter" class="btn btn-secondary" style="width: 100%;">
+            🔄 รีเซ็ตตัวกรอง
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Applicant Table Card -->
+    <div class="card" style="padding: 0; overflow: hidden;">
+      <div style="padding: 1rem 1.5rem; background: white; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
+        <h3 style="font-size: 1.15rem; color: #1e293b; font-weight: 700;">ตารางรายชื่อผู้สมัคร</h3>
+        <span id="tableCount" style="font-size: 0.85rem; color: #64748b; font-weight: 600;">แสดง 0 รายการ</span>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table">
+          <thead>
+            <tr>
+              <th style="width: 50px;">ที่</th>
+              <th>รหัสใบสมัคร / รหัสนักศึกษา</th>
+              <th>ชื่อ-นามสกุล / เลขบัตร</th>
+              <th>ระดับชั้น / สาขาวิชา</th>
+              <th>สถานศึกษาเดิม / GPAX</th>
+              <th>สถานะการสมัคร</th>
+              <th>วันที่สมัคร</th>
+              <th style="text-align: center; min-width: 250px;">การจัดการ</th>
+            </tr>
+          </thead>
+          <tbody id="applicantTableBody">
+            <!-- Rendered by JS -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Modal 1: View Details & Documents -->
+  <div class="modal-overlay" id="viewModal">
+    <div class="modal-content" style="max-width: 800px;">
+      <div class="modal-header">
+        <h3>📋 ข้อมูลและเอกสารหลักฐานของผู้สมัคร</h3>
+        <button class="modal-close">&times;</button>
+      </div>
+      <div class="modal-body" id="viewModalBody">
+        <!-- Rendered by JS -->
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary modal-close">ปิดหน้าต่าง</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 2: Change Status -->
+  <div class="modal-overlay" id="statusModal">
+    <div class="modal-content" style="max-width: 550px;">
+      <div class="modal-header">
+        <h3>⚙️ ปรับเปลี่ยนสถานะผู้สมัคร</h3>
+        <button class="modal-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p style="margin-bottom: 1rem; color: #475569;">
+          ผู้สมัคร: <strong id="statusModalApplicantName" style="color: #1e3a8a;">-</strong>
+        </p>
+
+        <div class="form-group">
+          <label class="form-label required">เลือกสถานะใหม่</label>
+          <select id="updateStatusSelect" class="form-control" style="font-size: 1rem; font-weight: 600;">
+            <option value="รอตรวจสอบ">รอตรวจสอบ</option>
+            <option value="เอกสารไม่ครบ">เอกสารไม่ครบ (แจ้งแก้ไข)</option>
+            <option value="ผ่านการคัดเลือก">ผ่านการคัดเลือก (รอวันมอบตัว)</option>
+            <option value="มอบตัวแล้ว">มอบตัวแล้ว</option>
+            <option value="สละสิทธิ์">สละสิทธิ์</option>
+          </select>
+        </div>
+
+        <div style="background: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; padding: 1rem; margin-bottom: 1rem;">
+          <label class="form-label" style="color: #92400e; font-weight: 600;">กรณีเอกสารไม่ครบ ระบุเอกสารที่ต้องส่งเพิ่ม:</label>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; font-size: 0.9rem; margin-top: 0.5rem;">
+            <label><input type="checkbox" id="chkMissingPhoto"> รูปถ่ายหน้าตรง</label>
+            <label><input type="checkbox" id="chkMissingIdCard"> สำเนาบัตรประชาชน</label>
+            <label><input type="checkbox" id="chkMissingHouse"> สำเนาทะเบียนบ้าน</label>
+            <label><input type="checkbox" id="chkMissingTranscript"> ใบ รบ./ปพ.1</label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">บันทึกข้อความ / หมายเหตุถึงผู้สมัคร</label>
+          <textarea id="reviewerNote" class="form-control" rows="3" placeholder="ระบุเหตุผล หรือคำแนะนำ เช่น ภาพถ่ายบัตรประชาชนไม่ชัดเจน หรือเกรดผ่านเกณฑ์..."></textarea>
+          <div style="font-size: 0.8rem; color: #64748b; margin-top: 0.25rem;">
+            * ข้อความนี้จะปรากฏให้ผู้สมัครเห็นเมื่อตรวจสอบสถานะ และส่งแจ้งเตือน
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary modal-close">ยกเลิก</button>
+        <button onclick="saveStatusChange()" class="btn btn-primary">💾 บันทึกและส่งแจ้งเตือน</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 3: Enrollment (มอบตัว & ออกรหัสนักศึกษา) -->
+  <div class="modal-overlay" id="enrollModal">
+    <div class="modal-content" style="max-width: 600px;">
+      <div class="modal-header">
+        <h3>🎓 บันทึกการมอบตัวและออกรหัสนักศึกษา</h3>
+        <button class="modal-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div style="background: #eff6ff; padding: 1rem; border-radius: 8px; margin-bottom: 1.25rem; border: 1px solid #bfdbfe;">
+          <div style="color: #1e40af; font-weight: 600;" id="enrollApplicantName">-</div>
+          <div style="color: #1e3a8a; font-size: 0.9rem;" id="enrollLevelMajor">-</div>
+        </div>
+
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label required">วันที่มอบตัว</label>
+            <input type="date" id="enrollmentDate" class="form-control" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label required">พยาน / ผู้รับมอบตัว</label>
+            <input type="text" id="witnessName" class="form-control" value="อาจารย์ประจำงานทะเบียน">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">กำหนดรหัสนักศึกษา (Auto-generate หรือกำหนดเอง)</label>
+          <input type="text" id="customStudentId" class="form-control" placeholder="เว้นว่างไว้เพื่อสร้างรหัสอัตโนมัติตามรูปแบบ สอศ.">
+          <div style="font-size: 0.8rem; color: #64748b; margin-top: 0.25rem;">
+            รูปแบบอัตโนมัติ: [ปี 2 หลัก][รหัสสาขา 5 หลัก][ลำดับ 4 หลัก] เช่น 69209010001
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label">ชื่อผู้ปกครองผู้มอบตัว</label>
+            <input type="text" id="enrollGuardianName" class="form-control">
+          </div>
+          <div class="form-group">
+            <label class="form-label">เบอร์โทรผู้ปกครอง</label>
+            <input type="tel" id="enrollGuardianPhone" class="form-control">
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary modal-close">ยกเลิก</button>
+        <button onclick="saveEnrollment()" class="btn btn-success">✅ ยืนยันการมอบตัวและออกรหัส</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 4: Notification Simulator & Logs -->
+  <div class="modal-overlay" id="notifModal">
+    <div class="modal-content" style="max-width: 650px;">
+      <div class="modal-header">
+        <h3>🔔 ระบบแจ้งเตือนอัตโนมัติ (LINE & System Notifications)</h3>
+        <button class="modal-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 1rem; margin-bottom: 1.25rem;">
+          <h4 style="color: #166534; font-size: 0.95rem;">สถานะระบบแจ้งเตือน: เปิดใช้งาน (Active)</h4>
+          <p style="color: #15803d; font-size: 0.85rem; margin-top: 0.25rem;">
+            ระบบพร้อมส่งข้อความแจ้งเตือนอัตโนมัติเมื่อมีผู้สมัครรายใหม่ และเมื่อเจ้าหน้าที่อัปเดตสถานะเอกสาร
+          </p>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">ทดสอบส่งข้อความแจ้งเตือนจำลอง</label>
+          <div style="display: flex; gap: 0.5rem;">
+            <input type="text" id="testNotifMsg" class="form-control" placeholder="พิมพ์ข้อความทดสอบ..." value="ทดสอบการแจ้งเตือน: ตรวจสอบเอกสารผู้สมัครเรียบร้อยแล้ว">
+            <button onclick="sendTestNotification()" class="btn btn-warning" style="white-space: nowrap;">ส่งทดสอบ</button>
+          </div>
+        </div>
+
+        <h4 style="color: #1e3a8a; margin: 1.25rem 0 0.5rem 0; font-size: 1rem;">📜 ประวัติการแจ้งเตือนล่าสุด</h4>
+        <div id="notifList" style="max-height: 250px; overflow-y: auto; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 0.75rem;">
+          <!-- Loaded by JS -->
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary modal-close">ปิด</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/validation.js"></script>
+  <script src="/js/admin.js"></script>
+</body>
+</html>

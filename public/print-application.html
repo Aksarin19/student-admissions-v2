@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ใบสมัครเข้าศึกษาต่อ - วิทยาลัยอาชีวศึกษาเทคโนโลยีสารสนเทศ</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sarabun:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Prompt:wght@400;600&display=swap">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: 'Sarabun', sans-serif;
+      font-size: 14pt;
+      line-height: 1.5;
+      color: #000;
+      background: #e2e8f0;
+      padding: 20px;
+    }
+    .print-actions {
+      max-width: 210mm;
+      margin: 0 auto 15px auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #1e3a8a;
+      color: white;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-family: 'Prompt', sans-serif;
+    }
+    .btn {
+      padding: 8px 18px;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      font-size: 14px;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-print {
+      background: #f59e0b;
+      color: #000;
+    }
+    .btn-close {
+      background: rgba(255,255,255,0.2);
+      color: white;
+    }
+    .sheet {
+      width: 210mm;
+      min-height: 297mm;
+      margin: 0 auto;
+      background: white;
+      padding: 20mm 20mm 15mm 20mm;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+      position: relative;
+    }
+    .doc-header {
+      text-align: center;
+      position: relative;
+      margin-bottom: 20px;
+    }
+    .doc-emblem {
+      width: 70px;
+      height: 70px;
+      margin: 0 auto 5px auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 40px;
+    }
+    .doc-title {
+      font-size: 18pt;
+      font-weight: 700;
+      line-height: 1.3;
+    }
+    .doc-subtitle {
+      font-size: 15pt;
+      font-weight: 600;
+    }
+    .doc-id-box {
+      position: absolute;
+      top: 0;
+      right: 0;
+      border: 1.5px solid #000;
+      padding: 6px 12px;
+      text-align: right;
+      font-size: 11pt;
+    }
+    .photo-box {
+      position: absolute;
+      top: 110px;
+      right: 0;
+      width: 30mm;
+      height: 40mm;
+      border: 1px dashed #666;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      font-size: 10pt;
+      color: #666;
+      overflow: hidden;
+      background: #fafafa;
+    }
+    .photo-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .section-title {
+      font-size: 13pt;
+      font-weight: 700;
+      margin: 12px 0 6px 0;
+      border-bottom: 1px solid #000;
+      padding-bottom: 2px;
+    }
+    .row {
+      margin-bottom: 6px;
+      display: flex;
+      flex-wrap: wrap;
+    }
+    .field {
+      margin-right: 15px;
+    }
+    .dots {
+      border-bottom: 1px dotted #000;
+      padding: 0 5px;
+      font-weight: 600;
+    }
+    .table-check {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 10px 0;
+      font-size: 12pt;
+    }
+    .table-check td, .table-check th {
+      border: 1px solid #000;
+      padding: 4px 8px;
+    }
+    .signature-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+      margin-top: 30px;
+      text-align: center;
+      font-size: 12pt;
+    }
+    .sig-line {
+      margin-top: 40px;
+      border-bottom: 1px dotted #000;
+      width: 80%;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      .print-actions {
+        display: none !important;
+      }
+      .sheet {
+        box-shadow: none;
+        margin: 0;
+        width: 100%;
+        min-height: 100%;
+        padding: 15mm 20mm;
+      }
+      @page {
+        size: A4;
+        margin: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="print-actions">
+    <div>
+      <strong>🖨️ แบบฟอร์มใบสมัครเรียน (A4)</strong> - จัดรูปแบบเอกสารอัตโนมัติพร้อมพิมพ์
+    </div>
+    <div style="display: flex; gap: 10px;">
+      <button onclick="window.print()" class="btn btn-print">🖨️ สั่งพิมพ์เอกสาร / บันทึกเป็น PDF</button>
+      <button onclick="window.close()" class="btn btn-close">ปิดหน้าต่าง</button>
+    </div>
+  </div>
+
+  <div class="sheet" id="printableSheet">
+    <!-- ID Box -->
+    <div class="doc-id-box">
+      เลขที่ใบสมัคร: <strong id="docId" style="font-size: 13pt;">-</strong><br>
+      วันที่ยื่นสมัคร: <span id="docDate">-</span>
+    </div>
+
+    <!-- Header -->
+    <div class="doc-header">
+      <div class="doc-emblem">🏛️</div>
+      <div class="doc-title">ใบสมัครคัดเลือกเข้าศึกษาต่อ ประจำปีการศึกษา <span id="docYear">2569</span></div>
+      <div class="doc-subtitle">วิทยาลัยอาชีวศึกษาเทคโนโลยีสารสนเทศ</div>
+      <div style="font-size: 12pt; color: #333;">สำนักงานคณะกรรมการการอาชีวศึกษา กระทรวงศึกษาธิการ</div>
+    </div>
+
+    <!-- Photo Box -->
+    <div class="photo-box" id="docPhotoBox">
+      รูปถ่าย<br>1 นิ้ว หรือ 1.5 นิ้ว
+    </div>
+
+    <!-- Content -->
+    <div style="margin-right: 35mm;">
+      <div class="section-title">๑. ความประสงค์ในการสมัครเข้าศึกษาต่อ</div>
+      <div class="row">
+        สมัครเข้าศึกษาระดับ: <span class="dots" id="docLevel">-</span>
+        หลักสูตร: <span class="dots" id="docProgram">-</span>
+      </div>
+      <div class="row">
+        สาขาวิชา: <span class="dots" id="docMajor" style="font-size: 14pt; color: #000;">-</span>
+        รหัสสาขาวิชา: <span class="dots" id="docMajorCode">-</span>
+      </div>
+    </div>
+
+    <div class="section-title">๒. ประวัติส่วนตัวของผู้สมัคร</div>
+    <div class="row">
+      ชื่อ - นามสกุล: <span class="dots" id="docFullName" style="font-size: 14pt;">-</span>
+      เพศ: <span class="dots" id="docGender">-</span>
+      สัญชาติ: <span class="dots" id="docNationality">ไทย</span>
+      ศาสนา: <span class="dots" id="docReligion">พุทธ</span>
+    </div>
+    <div class="row">
+      เลขประจำตัวประชาชน (๑๓ หลัก): <span class="dots" id="docNationalId" style="letter-spacing: 2px; font-weight: 700;">-</span>
+    </div>
+    <div class="row">
+      วัน/เดือน/ปี เกิด: <span class="dots" id="docBirthDate">-</span>
+      เบอร์โทรศัพท์มือถือ: <span class="dots" id="docPhone">-</span>
+      อีเมล: <span class="dots" id="docEmail">-</span>
+    </div>
+    <div class="row">
+      ที่อยู่ตามทะเบียนบ้าน: <span class="dots" id="docAddress" style="flex: 1;">-</span>
+    </div>
+
+    <div class="section-title">๓. ประวัติการศึกษาเดิม</div>
+    <div class="row">
+      สำเร็จการศึกษาจากสถานศึกษา: <span class="dots" id="docPrevSchool">-</span>
+      จังหวัด: <span class="dots" id="docPrevProvince">-</span>
+    </div>
+    <div class="row">
+      ผลการเรียนเฉลี่ยสะสม (GPAX): <span class="dots" id="docGpax" style="font-size: 14pt;">-</span>
+      ช่องทางที่ทราบข่าวการรับสมัคร: <span class="dots" id="docReferral">-</span>
+    </div>
+
+    <div class="section-title">๔. ข้อมูลผู้ปกครอง</div>
+    <div class="row">
+      ชื่อ - นามสกุล ผู้ปกครอง: <span class="dots" id="docGuardianName">-</span>
+      เกี่ยวข้องเป็น: <span class="dots" id="docGuardianRel">-</span>
+    </div>
+    <div class="row">
+      อาชีพ: <span class="dots" id="docGuardianOcc">-</span>
+      เบอร์โทรศัพท์ที่ติดต่อได้: <span class="dots" id="docGuardianPhone">-</span>
+    </div>
+
+    <div class="section-title">๕. เอกสารและหลักฐานประกอบการสมัคร</div>
+    <table class="table-check">
+      <thead>
+        <tr style="background: #f5f5f5;">
+          <th style="width: 60px; text-align: center;">ตรวจสอบ</th>
+          <th>รายการเอกสารหลักฐาน</th>
+          <th style="width: 150px; text-align: center;">หมายเหตุ</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="text-align: center;" id="chkPhoto">[  ]</td>
+          <td>๑. รูปถ่ายหน้าตรงชุดนักเรียน/นักศึกษา หรือชุดสุภาพ</td>
+          <td style="text-align: center;">๑ ฉบับ</td>
+        </tr>
+        <tr>
+          <td style="text-align: center;" id="chkId">[  ]</td>
+          <td>๒. สำเนาบัตรประจำตัวประชาชนของผู้สมัคร</td>
+          <td style="text-align: center;">๑ ฉบับ</td>
+        </tr>
+        <tr>
+          <td style="text-align: center;" id="chkHouse">[  ]</td>
+          <td>๓. สำเนาทะเบียนบ้านของผู้สมัคร</td>
+          <td style="text-align: center;">๑ ฉบับ</td>
+        </tr>
+        <tr>
+          <td style="text-align: center;" id="chkTranscript">[  ]</td>
+          <td>๔. ใบแสดงผลการเรียน (รบ. หรือ ปพ.๑) หรือใบรับรองผลการเรียน</td>
+          <td style="text-align: center;">๑ ฉบับ</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div style="font-size: 11pt; margin-top: 10px;">
+      ข้าพเจ้าขอรับรองว่าข้อความดังกล่าวข้างต้นเป็นความจริงทุกประการ หากปรากฏในภายหลังว่าไม่ตรงตามความเป็นจริง ข้าพเจ้ายินยอมให้ตัดสิทธิ์การเข้าศึกษาต่อโดยไม่มีเงื่อนไขใด ๆ ทั้งสิ้น
+    </div>
+
+    <!-- Signatures -->
+    <div class="signature-grid">
+      <div>
+        <div class="sig-line"></div>
+        <p style="margin-top: 5px;">ลงชื่อ.......................................................ผู้สมัคร</p>
+        <p>( <span id="sigApplicantName">...................................................</span> )</p>
+        <p>วันที่ .......... เดือน .................... พ.ศ. .............</p>
+      </div>
+
+      <div>
+        <div class="sig-line"></div>
+        <p style="margin-top: 5px;">ลงชื่อ.......................................................เจ้าหน้าที่รับสมัคร</p>
+        <p>( ................................................... )</p>
+        <p>วันที่ .......... เดือน .................... พ.ศ. .............</p>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/validation.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const id = urlParams.get('id');
+
+      if (!id) {
+        alert('กรุณาระบุรหัสใบสมัคร');
+        return;
+      }
+
+      try {
+        const res = await fetch(`/api/applicants/${id}`);
+        if (!res.ok) throw new Error('ไม่พบข้อมูลใบสมัคร');
+        const a = await res.json();
+
+        document.getElementById('docId').textContent = a.id;
+        document.getElementById('docDate').textContent = formatThaiDate(a.createdAt ? a.createdAt.split('T')[0] : '');
+        document.getElementById('docYear').textContent = a.academicYear || '2569';
+        document.getElementById('docLevel').textContent = a.level;
+        document.getElementById('docProgram').textContent = a.level === 'ปวช.' ? 'ประกาศนียบัตรวิชาชีพ (ปวช.)' : 'ประกาศนียบัตรวิชาชีพชั้นสูง (ปวส.)';
+        document.getElementById('docMajor').textContent = a.major;
+        document.getElementById('docMajorCode').textContent = a.majorCode || '-';
+
+        document.getElementById('docFullName').textContent = `${a.prefix}${a.firstName} ${a.lastName}`;
+        document.getElementById('sigApplicantName').textContent = `${a.prefix}${a.firstName} ${a.lastName}`;
+        document.getElementById('docGender').textContent = a.gender || '-';
+        document.getElementById('docNationality').textContent = a.nationality || 'ไทย';
+        document.getElementById('docReligion').textContent = a.religion || 'พุทธ';
+        document.getElementById('docNationalId').textContent = formatThaiID(a.nationalId);
+        document.getElementById('docBirthDate').textContent = formatThaiDate(a.birthDate);
+        document.getElementById('docPhone').textContent = formatPhone(a.phone);
+        document.getElementById('docEmail').textContent = a.email || '-';
+        document.getElementById('docAddress').textContent = a.address || '-';
+
+        document.getElementById('docPrevSchool').textContent = a.previousSchool || '-';
+        document.getElementById('docPrevProvince').textContent = a.previousSchoolProvince || '-';
+        document.getElementById('docGpax').textContent = a.gpax || '-';
+        document.getElementById('docReferral').textContent = a.referralSource || '-';
+
+        document.getElementById('docGuardianName').textContent = a.guardianName || '-';
+        document.getElementById('docGuardianRel').textContent = a.guardianRelation || '-';
+        document.getElementById('docGuardianOcc').textContent = a.guardianOccupation || '-';
+        document.getElementById('docGuardianPhone').textContent = formatPhone(a.guardianPhone || '');
+
+        // Files
+        if (a.files && a.files.photo) {
+          document.getElementById('docPhotoBox').innerHTML = `<img src="${a.files.photo}">`;
+          document.getElementById('chkPhoto').textContent = '[ ✓ ]';
+        }
+        if (a.files && a.files.idCardCopy) document.getElementById('chkId').textContent = '[ ✓ ]';
+        if (a.files && a.files.houseRegCopy) document.getElementById('chkHouse').textContent = '[ ✓ ]';
+        if (a.files && a.files.transcriptCopy) document.getElementById('chkTranscript').textContent = '[ ✓ ]';
+
+      } catch (err) {
+        alert(err.message);
+      }
+    });
+  </script>
+</body>
+</html>

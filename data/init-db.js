@@ -1,0 +1,321 @@
+const fs = require('fs');
+const path = require('path');
+
+function calcCheckDigit(digits12) {
+  let sum = 0;
+  for (let i = 0; i < 12; i++) {
+    sum += parseInt(digits12.charAt(i), 10) * (13 - i);
+  }
+  return (11 - (sum % 11)) % 10;
+}
+
+const mockIds = [
+  '110370258941',
+  '140990145236',
+  '230980056123',
+  '310150248967',
+  '150990184725',
+  '160010098452',
+  '210080074125',
+  '340980012547'
+].map(d => d + calcCheckDigit(d));
+
+const initialData = {
+  settings: {
+    collegeName: "วิทยาลัยอาชีวศึกษาเทคโนโลยีสารสนเทศ",
+    collegeSubName: "สำนักงานคณะกรรมการการอาชีวศึกษา (สอศ.)",
+    academicYear: "2569",
+    term: "1",
+    lineNotifyToken: "", // Optional user token
+    lineNotificationEnabled: true,
+    emailNotificationEnabled: false
+  },
+  majors: {
+    "ปวช.": [
+      { id: "V01", code: "20101", name: "สาขาวิชาช่างยนต์" },
+      { id: "V02", code: "20102", name: "สาขาวิชาช่างกลโรงงาน" },
+      { id: "V03", code: "20104", name: "สาขาวิชาช่างไฟฟ้ากำลัง" },
+      { id: "V04", code: "20105", name: "สาขาวิชาช่างอิเล็กทรอนิกส์" },
+      { id: "V05", code: "20901", name: "สาขาวิชาเทคโนโลยีสารสนเทศ" },
+      { id: "V06", code: "20201", name: "สาขาวิชาการบัญชี" },
+      { id: "V07", code: "20202", name: "สาขาวิชาการตลาด" },
+      { id: "V08", code: "20204", name: "สาขาวิชาคอมพิวเตอร์ธุรกิจ" }
+    ],
+    "ปวส.": [
+      { id: "H01", code: "30101", name: "สาขาวิชาเทคนิคเครื่องกล" },
+      { id: "H02", code: "30104", name: "สาขาวิชาไฟฟ้ากำลัง" },
+      { id: "H03", code: "30105", name: "สาขาวิชาอิเล็กทรอนิกส์" },
+      { id: "H04", code: "30901", name: "สาขาวิชาเทคโนโลยีสารสนเทศ" },
+      { id: "H05", code: "30201", name: "สาขาวิชาการบัญชี" },
+      { id: "H06", code: "30202", name: "สาขาวิชาการจัดการทั่วไป" },
+      { id: "H07", code: "30204", name: "สาขาวิชาคอมพิวเตอร์ธุรกิจ" }
+    ]
+  },
+  applicants: [
+    {
+      id: "APP-2569-0001",
+      academicYear: "2569",
+      nationalId: mockIds[0],
+      prefix: "นาย",
+      firstName: "กฤษฎา",
+      lastName: "รุ่งโรจน์สกุล",
+      gender: "ชาย",
+      birthDate: "2554-04-12",
+      phone: "0812345678",
+      email: "kritsada.r@gmail.com",
+      religion: "พุทธ",
+      nationality: "ไทย",
+      level: "ปวช.",
+      major: "สาขาวิชาเทคโนโลยีสารสนเทศ",
+      majorCode: "20901",
+      previousSchool: "โรงเรียนอนุบาลเทศบาลนครปฐม",
+      previousSchoolProvince: "นครปฐม",
+      gpax: "3.65",
+      address: "123/45 หมู่ 2 ต.สนามจันทร์ อ.เมือง จ.นครปฐม 73000",
+      guardianName: "นายสมชาย รุ่งโรจน์สกุล",
+      guardianRelation: "บิดา",
+      guardianPhone: "0898765432",
+      guardianOccupation: "รับราชการ",
+      referralSource: "อาจารย์แนะแนวมาที่โรงเรียน",
+      status: "มอบตัวแล้ว", // รอตรวจสอบ, เอกสารไม่ครบ, ผ่านการคัดเลือก, มอบตัวแล้ว, สละสิทธิ์
+      studentId: "69209010001",
+      enrollmentDate: "2569-11-01",
+      witnessName: "อาจารย์สมพร สอนดี",
+      reviewerNote: "เอกสารครบถ้วนสมบูรณ์ มอบตัวเรียบร้อยแล้ว ชำระเงินค่าขึ้นทะเบียนแล้ว",
+      missingDocs: [],
+      files: {
+        photo: "/uploads/sample_photo1.png",
+        idCardCopy: "/uploads/sample_doc.pdf",
+        houseRegCopy: "/uploads/sample_doc.pdf",
+        transcriptCopy: "/uploads/sample_doc.pdf"
+      },
+      createdAt: "2026-10-25T08:30:00.000Z",
+      updatedAt: "2026-11-01T10:15:00.000Z"
+    },
+    {
+      id: "APP-2569-0002",
+      academicYear: "2569",
+      nationalId: mockIds[1],
+      prefix: "นางสาว",
+      firstName: "ณัฐธิดา",
+      lastName: "แก้วประเสริฐ",
+      gender: "หญิง",
+      birthDate: "2554-08-20",
+      phone: "0823456789",
+      email: "natthida.k@gmail.com",
+      religion: "พุทธ",
+      nationality: "ไทย",
+      level: "ปวช.",
+      major: "สาขาวิชาการบัญชี",
+      majorCode: "20201",
+      previousSchool: "โรงเรียนวัดไร่ขิงวิทยา",
+      previousSchoolProvince: "นครปฐม",
+      gpax: "3.82",
+      address: "88/12 ต.ไร่ขิง อ.สามพราน จ.นครปฐม 73210",
+      guardianName: "นางพิมพา แก้วประเสริฐ",
+      guardianRelation: "มารดา",
+      guardianPhone: "0845678901",
+      guardianOccupation: "ค้าขาย",
+      referralSource: "Facebook แฟนเพจวิทยาลัย",
+      status: "ผ่านการคัดเลือก",
+      studentId: "",
+      enrollmentDate: "",
+      witnessName: "",
+      reviewerNote: "ตรวจสอบคุณสมบัติและเกรดผ่านเกณฑ์ รอวันมอบตัวและพิมพ์เอกสารใบมอบตัว",
+      missingDocs: [],
+      files: {
+        photo: "/uploads/sample_photo2.png",
+        idCardCopy: "/uploads/sample_doc.pdf",
+        houseRegCopy: "/uploads/sample_doc.pdf",
+        transcriptCopy: "/uploads/sample_doc.pdf"
+      },
+      createdAt: "2026-10-28T09:12:00.000Z",
+      updatedAt: "2026-10-29T14:20:00.000Z"
+    },
+    {
+      id: "APP-2569-0003",
+      academicYear: "2569",
+      nationalId: mockIds[2],
+      prefix: "นาย",
+      firstName: "ภานุวัฒน์",
+      lastName: "ชัยมงคล",
+      gender: "ชาย",
+      birthDate: "2552-02-15",
+      phone: "0891234567",
+      email: "panuwat.c@outlook.com",
+      religion: "พุทธ",
+      nationality: "ไทย",
+      level: "ปวส.",
+      major: "สาขาวิชาเทคโนโลยีสารสนเทศ",
+      majorCode: "30901",
+      previousSchool: "วิทยาลัยอาชีวศึกษาธนบุรี",
+      previousSchoolProvince: "กรุงเทพมหานคร",
+      gpax: "3.40",
+      address: "450 ซอยเพชรเกษม 54 แขวงบางหว้า เขตภาษีเจริญ กรุงเทพฯ 10160",
+      guardianName: "นายวิชัย ชัยมงคล",
+      guardianRelation: "บิดา",
+      guardianPhone: "0819998877",
+      guardianOccupation: "พนักงานบริษัท",
+      referralSource: "เพื่อนหรือรุ่นพี่แนะนำ",
+      status: "เอกสารไม่ครบ",
+      studentId: "",
+      enrollmentDate: "",
+      witnessName: "",
+      reviewerNote: "สำเนาทะเบียนบ้านและใบแสดงผลการเรียนไม่ชัดเจน กรุณาถ่ายภาพหรือสแกนใหม่ให้เห็นตัวหนังสือชัดเจน",
+      missingDocs: ["houseRegCopy", "transcriptCopy"],
+      files: {
+        photo: "/uploads/sample_photo1.png",
+        idCardCopy: "/uploads/sample_doc.pdf",
+        houseRegCopy: null,
+        transcriptCopy: null
+      },
+      createdAt: "2026-11-02T11:05:00.000Z",
+      updatedAt: "2026-11-03T16:00:00.000Z"
+    },
+    {
+      id: "APP-2569-0004",
+      academicYear: "2569",
+      nationalId: mockIds[3],
+      prefix: "นาย",
+      firstName: "ธนกฤต",
+      lastName: "ศิริวัฒนานุกูล",
+      gender: "ชาย",
+      birthDate: "2554-11-05",
+      phone: "0956781234",
+      email: "tanakrit.s@hotmail.com",
+      religion: "พุทธ",
+      nationality: "ไทย",
+      level: "ปวช.",
+      major: "สาขาวิชาช่างยนต์",
+      majorCode: "20101",
+      previousSchool: "โรงเรียนรัตนโกสินทร์สมโภชบวรนิเวศศาลายา",
+      previousSchoolProvince: "นครปฐม",
+      gpax: "3.15",
+      address: "99 หมู่ 5 ต.ศาลายา อ.พุทธมณฑล จ.นครปฐม 73170",
+      guardianName: "นายประเสริฐ ศิริวัฒนานุกูล",
+      guardianRelation: "บิดา",
+      guardianPhone: "0861112233",
+      guardianOccupation: "ธุรกิจส่วนตัว",
+      referralSource: "ป้ายประชาสัมพันธ์ / ไวนิล",
+      status: "รอตรวจสอบ",
+      studentId: "",
+      enrollmentDate: "",
+      witnessName: "",
+      reviewerNote: "",
+      missingDocs: [],
+      files: {
+        photo: "/uploads/sample_photo2.png",
+        idCardCopy: "/uploads/sample_doc.pdf",
+        houseRegCopy: "/uploads/sample_doc.pdf",
+        transcriptCopy: "/uploads/sample_doc.pdf"
+      },
+      createdAt: "2026-11-05T14:40:00.000Z",
+      updatedAt: "2026-11-05T14:40:00.000Z"
+    },
+    {
+      id: "APP-2569-0005",
+      academicYear: "2569",
+      nationalId: mockIds[4],
+      prefix: "นางสาว",
+      firstName: "วรัญญา",
+      lastName: "สินธุประเสริฐ",
+      gender: "หญิง",
+      birthDate: "2552-06-18",
+      phone: "0834567890",
+      email: "waranya.s@gmail.com",
+      religion: "พุทธ",
+      nationality: "ไทย",
+      level: "ปวส.",
+      major: "สาขาวิชาการจัดการทั่วไป",
+      majorCode: "30202",
+      previousSchool: "โรงเรียนโพธาวัฒนาเสนี",
+      previousSchoolProvince: "ราชบุรี",
+      gpax: "3.55",
+      address: "14/2 หมู่ 1 ต.บ้านฆ้อง อ.โพธาราม จ.ราชบุรี 70120",
+      guardianName: "นางสุภาพร สินธุประเสริฐ",
+      guardianRelation: "มารดา",
+      guardianPhone: "0876543210",
+      guardianOccupation: "เกษตรกร",
+      referralSource: "อาจารย์แนะแนวมาที่โรงเรียน",
+      status: "มอบตัวแล้ว",
+      studentId: "69302020001",
+      enrollmentDate: "2569-11-02",
+      witnessName: "อาจารย์มณี วงศ์สว่าง",
+      reviewerNote: "มอบตัวเรียบร้อย ชำระค่าธรรมเนียมพร้อมตัดชุดเครื่องแบบ",
+      missingDocs: [],
+      files: {
+        photo: "/uploads/sample_photo1.png",
+        idCardCopy: "/uploads/sample_doc.pdf",
+        houseRegCopy: "/uploads/sample_doc.pdf",
+        transcriptCopy: "/uploads/sample_doc.pdf"
+      },
+      createdAt: "2026-10-27T10:00:00.000Z",
+      updatedAt: "2026-11-02T13:30:00.000Z"
+    },
+    {
+      id: "APP-2569-0006",
+      academicYear: "2569",
+      nationalId: mockIds[5],
+      prefix: "นาย",
+      firstName: "อธิปัตย์",
+      lastName: "บุญส่งเสริม",
+      gender: "ชาย",
+      birthDate: "2554-10-09",
+      phone: "0887654321",
+      email: "athipat.b@gmail.com",
+      religion: "พุทธ",
+      nationality: "ไทย",
+      level: "ปวช.",
+      major: "สาขาวิชาช่างไฟฟ้ากำลัง",
+      majorCode: "20104",
+      previousSchool: "โรงเรียนกาญจนาภิเษกวิทยาลัย นครปฐม",
+      previousSchoolProvince: "นครปฐม",
+      gpax: "3.28",
+      address: "56 ต.คลองใหม่ อ.สามพราน จ.นครปฐม 73110",
+      guardianName: "นายมานพ บุญส่งเสริม",
+      guardianRelation: "บิดา",
+      guardianPhone: "0891238899",
+      guardianOccupation: "รับเหมาก่อสร้าง",
+      referralSource: "TikTok / โซเชียลมีเดีย",
+      status: "รอตรวจสอบ",
+      studentId: "",
+      enrollmentDate: "",
+      witnessName: "",
+      reviewerNote: "",
+      missingDocs: [],
+      files: {
+        photo: "/uploads/sample_photo2.png",
+        idCardCopy: "/uploads/sample_doc.pdf",
+        houseRegCopy: "/uploads/sample_doc.pdf",
+        transcriptCopy: "/uploads/sample_doc.pdf"
+      },
+      createdAt: "2026-11-06T09:20:00.000Z",
+      updatedAt: "2026-11-06T09:20:00.000Z"
+    }
+  ],
+  notifications: [
+    {
+      id: "NOTIF-001",
+      recipient: "admin",
+      type: "new_applicant",
+      applicantId: "APP-2569-0006",
+      title: "มีผู้สมัครเรียนรายใหม่เข้ามา",
+      message: "นายอธิปัตย์ บุญส่งเสริม สมัคร ปวช. สาขาวิชาช่างไฟฟ้ากำลัง (รอตรวจสอบเอกสาร)",
+      timestamp: "2026-11-06T09:20:15.000Z",
+      status: "sent"
+    },
+    {
+      id: "NOTIF-002",
+      recipient: mockIds[2],
+      type: "status_change",
+      applicantId: "APP-2569-0003",
+      title: "แจ้งเตือนเอกสารการสมัครไม่ครบถ้วน",
+      message: "สำเนาทะเบียนบ้านและใบแสดงผลการเรียนไม่ชัดเจน กรุณาถ่ายภาพหรือสแกนใหม่ให้เห็นตัวหนังสือชัดเจน",
+      timestamp: "2026-11-03T16:00:20.000Z",
+      status: "sent"
+    }
+  ]
+};
+
+fs.writeFileSync(path.join(__dirname, 'database.json'), JSON.stringify(initialData, null, 2), 'utf8');
+console.log('database.json initialized with ' + initialData.applicants.length + ' applicants.');
